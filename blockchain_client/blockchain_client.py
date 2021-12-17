@@ -1,3 +1,4 @@
+from Tools.scripts.make_ctype import method
 from flask import Flask,render_template,jsonify
 import Crypto
 import Crypto.Random
@@ -21,6 +22,10 @@ def index():
 @app.route('/make/transaction')
 def make_transaction():
     return render_template('/make_transaction.html')
+
+@app.route('/generate/transaction', methods=['POST'])
+def generate_transaction():
+    return 'Done'
 
 @app.route('/view/transactions')
 def view_transactions():
