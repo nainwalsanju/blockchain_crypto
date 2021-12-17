@@ -12,7 +12,68 @@
     <link rel="stylesheet" href="/static/css/custom.css">
 </head>
 <body>
-    <p2>THis is client Side</p2>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+            <a href="#" class="navbar-brand">BlockChain Client</a>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item active">
+                        <a href="/" class="nav-link">Wallet Generator</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/make/transaction" class="nav-link">Make Transaction</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/view/transactions" class="nav-link">View Transactions</a>
+                    </li>
+                </ul>
+            </div>
+            
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 text-center">
+                <div class="card-body">
+                    <h4 class="card-title">Wallet Generator</h4>
+                    <p class="card-text">Click on the button below to generate your Wallet</p>
+                    <input type="button" class="btn btn-primary btn-lg" value="Generate Wallet">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="row">
+            <label for="" class="col-sm-2">Public Key:</label>
+            <div class="col-sm-10">
+                <textarea class="form-control"  name="" id="public_key" rows="5" readonly></textarea>
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <label for="" class="col-sm-2">Private Key:</label>
+            <div class="col-sm-10">
+                <textarea class="form-control"  name="" id="private_key" rows="5" readonly></textarea>
+            </div>
+        </div>
+
+        <br>
+        <div class="row" id="warning" style="display:none">
+            <div class="col-sm-12">
+                <div class="alert alert-danger" role="alert">
+                    IMPORTANT
+                    <ul>
+                        <li>Save your public and private key. These keys cannot be recovered!</li>
+                        <li>Don't Share private key with anyone!</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
     <script src="/static/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="/static/vendor/jquery/jquery.min.js"></script>
     <script src="/static/vendor/DataTables/js/datatables.min.js"></script>
