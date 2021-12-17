@@ -1,6 +1,7 @@
 from time import time
-from flask import Flask, render_template, jsonify
+from flask import Flask, render_template, jsonify, request
 from flask_cors import CORS
+from collections import OrderedDict
 
 
 class BlockChain:
@@ -23,6 +24,23 @@ class BlockChain:
         self.transactions = []
         self.chain.append(block)
 
+    def submit_transaction(self, sender_public_key, recipient_public_key, signature, amount):
+        # TODO: Reward the miner
+        # TODO: Signature validation
+
+        transaction = OrderedDict({
+            'sender_public_key': sender_public_key,
+            'recipient_public_key': recipient_public_key,
+            'signature': signature,
+            'amount': amount
+        })
+        signature_verification = True
+        if signature_verification:
+            self.transactions.append(transaction)
+            return len(self.chain) + 1
+        else:
+            return False
+
 
 # Instaniate the Blockchain
 blockchain = BlockChain()
@@ -39,10 +57,20 @@ def index():
 
 @app.route('/transactions/new', methods=['POST'])
 def new_transaction():
-    response = {
-        'message': 'OK',
-    }
-    return jsonify(response), 201
+    values = request.form
+    print(values.to_dict())
+    # TODO: check the required fields
+    transaction_results = blockchain.submit_transaction(values['confirmation_sender_public_key'],
+                                                        values['confirmation_recipient_public_key'],
+                                                        values['transaction_signature'], values['confirmation_amount'])
+
+
+    if transaction_results == False:
+        response = {'message': 'Invalid transaction/signature'}
+        return jsonify(response), 406
+    else:
+        response = {'message': 'Transaction will be added to the Block ' + str(transaction_results)}
+        return jsonify(response), 201
 
 
 if __name__ == '__main__':
