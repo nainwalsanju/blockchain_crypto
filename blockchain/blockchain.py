@@ -1,8 +1,11 @@
 from time import time
 from flask import Flask, render_template, jsonify, request
 from flask_cors import CORS
+from Crypto.PublicKey import RSA
 from collections import OrderedDict
-
+from Crypto.Signature import PKCS1_v1_5
+from Crypto.Hash import SHA
+import binascii
 
 class BlockChain:
     def __init__(self):
@@ -24,6 +27,12 @@ class BlockChain:
         self.transactions = []
         self.chain.append(block)
 
+    def verify_transaction_signature(self, sender_public_key, signature, transaction):
+        public_key = RSA.importKey(binascii.unhexlify(sender_public_key))
+        verifier = PKCS1_v1_5.new(public_key)
+        h = SHA.new(str(transaction).encode('utf8'))
+        return verifier.verify(h, binascii.unhexlify(signature))
+
     def submit_transaction(self, sender_public_key, recipient_public_key, signature, amount):
         # TODO: Reward the miner
         # TODO: Signature validation
@@ -31,10 +40,9 @@ class BlockChain:
         transaction = OrderedDict({
             'sender_public_key': sender_public_key,
             'recipient_public_key': recipient_public_key,
-            'signature': signature,
             'amount': amount
         })
-        signature_verification = True
+        signature_verification = self.verify_transaction_signature(sender_public_key, signature, transaction)
         if signature_verification:
             self.transactions.append(transaction)
             return len(self.chain) + 1
@@ -58,7 +66,6 @@ def index():
 @app.route('/transactions/new', methods=['POST'])
 def new_transaction():
     values = request.form
-    print(values.to_dict())
     # TODO: check the required fields
     transaction_results = blockchain.submit_transaction(values['confirmation_sender_public_key'],
                                                         values['confirmation_recipient_public_key'],
