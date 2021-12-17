@@ -6,10 +6,9 @@
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Blockchain Frontend</title>
-
+    <link rel="stylesheet" href="/static/vendor/font-awesome/font-awesome.min.css">
     <link rel="stylesheet" href="/static/vendor/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="/static/vendor/DataTables/css/datatables.min.css">
-    <link rel="stylesheet" href="/static/vendor/font-awesome/font-awesome.min.css">
     <link rel="stylesheet" href="/static/css/custom.css">
 
 </head>
@@ -83,10 +82,46 @@
 <script src="/static/vendor/DataTables/js/ellipsis.js"></script>
 
 <script>
-        $(function() {
+    $(function() {
 
+            $.ajax({
+                url: "/transactions/get",
+                type: "GET",
+                success: function(response) {
+
+                    let transactions = []
+                    let count = 1
+
+                    for (i=0; i<response['transactions'].length; i++) {
+
+                        let transaction = [
+                            count,
+                            response['transactions'][i]['sender_public_key'],
+                            response['transactions'][i]['recipient_public_key'],
+                            response['transactions'][i]['amount'],
+                        ]
+
+                        transactions.push(transaction);
+
+                        count += 1;
+                    }
+
+                    $('#unmined_transactions_table').dataTable({
+                        data: transactions,
+                        columns: [
+                            {title: "#"},
+                            {title: "Sender Public Key"},
+                            {title: "Recipient Public Key"},
+                            {title: "Amount"},
+                        ],
+                        columnDefs: [{targets: [1,2,3], render: $.fn.dataTable.render.ellipsis(35)}]
+                    });
+                },
+                error: function(error) {
+                    console.log(error);
+                }
+            });
         });
-
 
 </script>
 
