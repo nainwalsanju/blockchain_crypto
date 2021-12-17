@@ -7,6 +7,8 @@ from Crypto.Signature import PKCS1_v1_5
 from Crypto.Hash import SHA
 import binascii
 
+MINING_SENDER = "THE BLOCKCHAIN"
+
 class BlockChain:
     def __init__(self):
         self.transactions = []
@@ -31,7 +33,11 @@ class BlockChain:
         public_key = RSA.importKey(binascii.unhexlify(sender_public_key))
         verifier = PKCS1_v1_5.new(public_key)
         h = SHA.new(str(transaction).encode('utf8'))
-        return verifier.verify(h, binascii.unhexlify(signature))
+        try:
+            verifier.verify(h, binascii.unhexlify(signature))
+            return True
+        except ValueError:
+            return False
 
     def submit_transaction(self, sender_public_key, recipient_public_key, signature, amount):
         # TODO: Reward the miner
@@ -42,12 +48,16 @@ class BlockChain:
             'recipient_public_key': recipient_public_key,
             'amount': amount
         })
-        signature_verification = self.verify_transaction_signature(sender_public_key, signature, transaction)
-        if signature_verification:
+        if sender_public_key == MINING_SENDER:
             self.transactions.append(transaction)
             return len(self.chain) + 1
         else:
-            return False
+            signature_verification = self.verify_transaction_signature(sender_public_key, signature, transaction)
+            if signature_verification:
+                self.transactions.append(transaction)
+                return len(self.chain) + 1
+            else:
+                return False
 
 
 # Instaniate the Blockchain
@@ -67,6 +77,11 @@ def index():
 def new_transaction():
     values = request.form
     # TODO: check the required fields
+
+    required = ['confirmation_sender_public_key','confirmation_recipient_public_key','transaction_signature','confirmation_amount']
+    if not all( k in values for k in required):
+        return "Missing Values",400
+
     transaction_results = blockchain.submit_transaction(values['confirmation_sender_public_key'],
                                                         values['confirmation_recipient_public_key'],
                                                         values['transaction_signature'], values['confirmation_amount'])
