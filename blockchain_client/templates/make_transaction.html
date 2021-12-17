@@ -84,7 +84,8 @@
 </div>
 
 <!-- Modal -->
-<div class="modal modal-alert fade" id="basic_modal" tabindex="-1" role="dialog" aria-labelledby="basic_modal" aria-hidden="true">
+<div class="modal modal-alert fade" id="basic_modal" tabindex="-1" role="dialog" aria-labelledby="basic_modal"
+     aria-hidden="true">
     <div class="modal-dialog">
 
         <div class="modal-content">
@@ -157,35 +158,85 @@
     </div>
 </div>
 
+
+<!-- Alert Message for successful transaction -->
+<div class="modal modal-alert fade" id="success_transaction_modal" tabindex="-1" role="dialog"
+     aria-labelledby="basicModal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            </div>
+
+            <div class="modal-body">
+                <div class="alert alert-success" role="alert">
+                    <h4 class="alert-heading">Successful Transaction!</h4>
+                    <p>You successfully completed your transaction. It will be added to the next block.</p>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" id="button_confirm_transaction" class="btn btn-success" data-dismiss="modal">OK
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
 <script src="/static/vendor/jquery/jquery.min.js"></script>
 <script src="/static/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 <script src="/static/vendor/DataTables/js/datatables.min.js"></script>
 <script src="/static/vendor/DataTables/js/ellipsis.js"></script>
 
 <script>
-        $(function(){
-            $("#generate_transaction").click(function(){
+        $(function() {
+            $("#generate_transaction").click(function() {
                 $.ajax({
                     url: "/generate/transaction",
                     type: "POST",
                     dataType: 'json',
-                    data : $("#transaction_form").serialize(),
-
+                    data: $('#transaction_form').serialize(),
                     success: function(response) {
-                            document.getElementById('confirmation_sender_public_key').value = response['transaction']['sender_public_key'];
-                            document.getElementById('confirmation_recipient_public_key').value = response['transaction']['recipient_public_key'];
-                            document.getElementById('confirmation_amount').value = response['transaction']['amount'];
-                            document.getElementById('transaction_signature').value = response['signature'];
-                            $('#basic_modal').modal('show');
-                    },
+                        document.getElementById('confirmation_sender_public_key').value = response['transaction']['sender_public_key'];
+                        document.getElementById('confirmation_recipient_public_key').value = response['transaction']['recipient_public_key'];
+                        document.getElementById('confirmation_amount').value = response['transaction']['amount'];
+                        document.getElementById('transaction_signature').value = response['signature'];
 
-                    error: function(error){
+                        $('#basic_modal').modal('show');
+                    },
+                    error: function(error) {
                         console.log(error);
                     }
-                })
-            })
-        });
+                });
+            });
 
+            $('#button_confirm_transaction').click(function() {
+                $.ajax({
+                    url: document.getElementById('node_url').value + '/transactions/new',
+                    type: 'POST',
+                    dataType: 'json',
+                    data: $('confirmation_transaction_form').serialize(),
+                    success: function(response) {
+                        $('#sender_public_key').val('');
+                        $('#sender_private_key').val('');
+                        $('#recipient_public_key').val('');
+                        $('#amount').val('');
+
+                        $('#basic_modal').modal('hide');
+                        $('#success_transaction_modal').modal('show');
+
+                    },
+                    error: function(error) {
+                        console.log(error);
+                    }
+
+                });
+            });
+
+        });
 
 </script>
 </body>
